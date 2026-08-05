@@ -2,6 +2,126 @@
 
 @section('title', $game->title . ' - GameHub HTML5')
 
+@push('styles')
+<style>
+    /* Fullscreen Mode CSS Styles */
+    #gameFrameContainer:fullscreen {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: 100vw !important;
+        max-height: 100vh !important;
+        border-radius: 0 !important;
+        border: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        background-color: #000 !important;
+        z-index: 999999 !important;
+    }
+    #gameFrameContainer:-webkit-full-screen {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: 100vw !important;
+        max-height: 100vh !important;
+        border-radius: 0 !important;
+        border: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        background-color: #000 !important;
+        z-index: 999999 !important;
+    }
+    #gameFrameContainer:-moz-full-screen {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: 100vw !important;
+        max-height: 100vh !important;
+        border-radius: 0 !important;
+        border: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        background-color: #000 !important;
+        z-index: 999999 !important;
+    }
+    #gameFrameContainer.is-fullscreen {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: 100vw !important;
+        max-height: 100vh !important;
+        border-radius: 0 !important;
+        border: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        background-color: #000 !important;
+        z-index: 999999 !important;
+    }
+
+    #gameFrameContainer:fullscreen #gameFrameWrapper {
+        flex: 1 1 0% !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-height: none !important;
+        aspect-ratio: auto !important;
+    }
+    #gameFrameContainer:-webkit-full-screen #gameFrameWrapper {
+        flex: 1 1 0% !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-height: none !important;
+        aspect-ratio: auto !important;
+    }
+    #gameFrameContainer:-moz-full-screen #gameFrameWrapper {
+        flex: 1 1 0% !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-height: none !important;
+        aspect-ratio: auto !important;
+    }
+    #gameFrameContainer.is-fullscreen #gameFrameWrapper {
+        flex: 1 1 0% !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-height: none !important;
+        aspect-ratio: auto !important;
+    }
+
+    #gameFrameContainer:fullscreen #gameIframe {
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 0 !important;
+        border: none !important;
+    }
+    #gameFrameContainer:-webkit-full-screen #gameIframe {
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 0 !important;
+        border: none !important;
+    }
+    #gameFrameContainer:-moz-full-screen #gameIframe {
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 0 !important;
+        border: none !important;
+    }
+    #gameFrameContainer.is-fullscreen #gameIframe {
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 0 !important;
+        border: none !important;
+    }
+</style>
+@endpush
+
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
 
@@ -20,18 +140,19 @@
         <!-- Responsive Iframe Frame Wrapper -->
         <div id="gameFrameContainer" class="relative w-full rounded-2xl overflow-hidden glass-panel border border-slate-700/80 shadow-2xl bg-slate-950">
             
-            <div class="relative w-full aspect-video max-h-[80vh] flex items-center justify-center">
+            <div id="gameFrameWrapper" class="relative w-full aspect-video max-h-[80vh] flex items-center justify-center transition-all duration-300">
                 <iframe id="gameIframe"
                         src="{{ $game->play_url }}"
                         title="{{ $game->title }}"
                         class="w-full h-full border-0 rounded-2xl bg-black"
                         allow="fullscreen; autoplay; payment; accelerometer; gyroscope; microphone"
+                        allowfullscreen
                         sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals">
                 </iframe>
             </div>
 
             <!-- Floating Control Bar -->
-            <div class="flex items-center justify-between px-6 py-3.5 bg-slate-900/90 border-t border-slate-800 text-xs text-slate-300">
+            <div class="flex items-center justify-between px-6 py-3.5 bg-slate-900/90 border-t border-slate-800 text-xs text-slate-300 flex-shrink-0">
                 
                 <div class="flex items-center space-x-3">
                     <span class="font-outfit font-bold text-white text-base">{{ $game->title }}</span>
@@ -49,7 +170,7 @@
                     </button>
 
                     <!-- Fullscreen Button -->
-                    <button type="button" onclick="toggleGameFullscreen()"
+                    <button type="button" id="fullscreenBtn" onclick="toggleGameFullscreen()"
                         class="inline-flex items-center space-x-1.5 px-4 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium shadow-md shadow-purple-600/30 transition-all text-xs">
                         <i class="fa-solid fa-expand"></i>
                         <span>Layar Penuh</span>
@@ -141,19 +262,56 @@
         const container = document.getElementById('gameFrameContainer');
         if (!container) return;
 
-        if (!document.fullscreenElement) {
+        const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+
+        if (!isFS) {
             if (container.requestFullscreen) {
                 container.requestFullscreen();
             } else if (container.webkitRequestFullscreen) {
                 container.webkitRequestFullscreen();
+            } else if (container.mozRequestFullScreen) {
+                container.mozRequestFullScreen();
             } else if (container.msRequestFullscreen) {
                 container.msRequestFullscreen();
             }
         } else {
             if (document.exitFullscreen) {
                 document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
             }
         }
     }
+
+    function handleFullscreenChange() {
+        const container = document.getElementById('gameFrameContainer');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+
+        if (container) {
+            if (isFS) {
+                container.classList.add('is-fullscreen');
+            } else {
+                container.classList.remove('is-fullscreen');
+            }
+        }
+
+        if (fullscreenBtn) {
+            if (isFS) {
+                fullscreenBtn.innerHTML = '<i class="fa-solid fa-compress"></i> <span>Keluar Layar Penuh</span>';
+            } else {
+                fullscreenBtn.innerHTML = '<i class="fa-solid fa-expand"></i> <span>Layar Penuh</span>';
+            }
+        }
+    }
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
 </script>
 @endpush
